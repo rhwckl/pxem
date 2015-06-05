@@ -1,0 +1,35 @@
+interpreter.hpp
+. delimiter. ignored
+d exit
+
+input_command.hpp
+l push the input as char
+_ push the input as int
+
+output_command.hpp
+p print all the contents of the stack
+o pop and print it
+
+stack_command.hpp
+c push the back of the stack
+s pop
+v reverse
+
+arithmetic_command.hpp
+	(pop twice and push:)
++ addition of them
+- subtraction of the first-popped value from another
+! multiplication fo them
+
+temporary_memory_command.hpp
+t pop and push it to the temporary memory
+m push the back of the temporary memory to the stack
+
+conditional_branch_command.hpp
+w pop and jump forward to the command after the matching 'a' if the popped value is zero
+a jump back to the matching 'w', 'x', 'y' or 'z'
+	(pop twice and compare:)
+x jump when the second-popped > another
+y jump when the second-popped < another
+z jump when the second-popped == another
+

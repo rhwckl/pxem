@@ -1,0 +1,35 @@
+interpreter.hpp
+. 区切り文字
+d 終了
+
+input_command.hpp
+l 入力からcharを取得してプッシュ
+_ 入力からintを取得してプッシュ
+
+output_command.hpp
+p スタック全体を出力
+o スタックをポップしてそのデータを出力
+
+stack_command.hpp
+c スタックの最後をプッシュ
+s ポップ
+v スタックを逆順にする
+
+arithmetic_command.hpp
+	(2回ポップして)
++ 和をプッシュ
+- 後にポップしたデータからもう一方を引いた結果をプッシュ
+! 積をプッシュ
+
+temporary_memory_command.hpp
+t ポップした値を一時領域にプッシュ
+m 一時領域の最後のデータをプッシュ
+
+conditional_branch_command.hpp
+w ポップした値が0なら対応する 'a' の次にジャンプ
+a 対応する 'w', 'x', 'y', 'z' のいずれかに戻る
+	(2回ポップして値を比較。後にポップしたデータがもう一方より・・・)
+x : 大きければジャンプ
+y : 小さければジャンプ
+z : 等しければジャンプ
+
