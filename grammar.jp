@@ -1,5 +1,5 @@
 interpreter.hpp
-. 区切り文字
+. 区切り文字、無視される
 d 終了
 
 input_command.hpp
