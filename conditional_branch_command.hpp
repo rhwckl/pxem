@@ -1,3 +1,6 @@
+namespace pxem
+{
+
 template
 	<class InputIterator
 	,class UnaryPredicateLeft
@@ -36,8 +39,7 @@ struct equal_in
 
 namespace ph=sprout::placeholders;
 
-template<class Stack,class Tmp,int iidx,int idx>
-struct interpreter<Stack,Tmp,iidx,idx,'a'>
+COMMAND_APPEND("a")
 {
 	typedef typename interpreter
 		<Stack
@@ -67,14 +69,14 @@ struct branch
 		<Stack
 			,Tmp
 			,iidx
-			,idx+1
+			,arginterp<idx>::next
 		>::type type;
 };
 
 template<class Stack,class Tmp,int iidx,int idx>
 struct branch<Stack,Tmp,iidx,idx,true>
 {
-	static constexpr int next=matching_position
+	static constexpr int matching_a=matching_position
 		(code.begin()+idx
 		,code.end()
 		,sprout::cbind
@@ -87,38 +89,32 @@ struct branch<Stack,Tmp,iidx,idx,true>
 			,ph::_1
 			,'a'
 			)
-		)-code.begin()+1;
+		)-code.begin();
 
 	typedef typename interpreter
 		<Stack
 		,Tmp
 		,iidx
-		,next
+		,arginterp<matching_a>::next
 		>::type type;
 };
 
-template<class Stack,class Tmp,int iidx,int idx>
-struct interpreter<Stack,Tmp,iidx,idx,'w'>
+COMMAND_APPEND("w")
 {
 	typedef typename branch
 		<typename mpl::pop_back<Stack>::type
-		,Tmp
-		,iidx
-		,idx
+		,Tmp,iidx,idx
 		,mpl::back<Stack>::type::value==0
 		>::type type;
 };
 
 #define CONDITIONAL_BRANCH_COMMAND(command,op) \
-template<class Stack,class Tmp,int iidx,int idx> \
-struct interpreter<Stack,Tmp,iidx,idx,command> \
+COMMAND_APPEND(command) \
 { \
 	typedef last2<Stack> tmp; \
 	typedef typename branch \
 		<typename tmp::pop2 \
-		,Tmp \
-		,iidx \
-		,idx \
+		,Tmp,iidx,idx \
 		,mpl::op \
 			<typename tmp::second_popped \
 			,typename tmp::first_popped \
@@ -129,4 +125,8 @@ struct interpreter<Stack,Tmp,iidx,idx,command> \
 CONDITIONAL_BRANCH_COMMAND('x',greater);
 CONDITIONAL_BRANCH_COMMAND('y',less);
 CONDITIONAL_BRANCH_COMMAND('z',equal_to);
+
+#undef CONDITIONAL_BRANCH_COMMAND
+
+} //namespace pxem
 

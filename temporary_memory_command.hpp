@@ -1,5 +1,7 @@
-template<class Stack,class Tmp,int iidx,int idx>
-struct interpreter<Stack,Tmp,iidx,idx,'t'>
+namespace pxem
+{
+
+COMMAND_APPEND("t")
 {
 	typedef typename interpreter
 		<typename mpl::pop_back<Stack>::type
@@ -8,12 +10,11 @@ struct interpreter<Stack,Tmp,iidx,idx,'t'>
 			,typename mpl::back<Stack>::type
 			>::type
 		,iidx
-		,idx+1
+		,arginterp<idx>::next
 		>::type type;
 };
 
-template<class Stack,class Tmp,int iidx,int idx>
-struct interpreter<Stack,Tmp,iidx,idx,'m'>
+COMMAND_APPEND("m")
 {
 	typedef typename interpreter
 		<typename mpl::push_back
@@ -22,7 +23,9 @@ struct interpreter<Stack,Tmp,iidx,idx,'m'>
 			>::type
 		,Tmp
 		,iidx
-		,idx+1
+		,arginterp<idx>::next
 		>::type type;
 };
+
+} //namespace pxem
 
