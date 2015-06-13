@@ -1,5 +1,4 @@
-interpreter.hpp
-. delimiter. ignored
+. delimiter
 d exit
 
 input_command.hpp
@@ -7,7 +6,10 @@ l push the input as char
 _ push the input as int
 
 output_command.hpp
-p print all the contents of the stack
+pa print all the contents of the stack (may not work properly with gcc)
+p print all the contents of the stack as char
+pc same as 'p'
+pi print all the contents of the stack as int
 o pop and print it
 
 stack_command.hpp
