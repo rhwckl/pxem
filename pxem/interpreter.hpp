@@ -56,18 +56,14 @@ constexpr auto command_usable_
 static constexpr auto command_
 	= +weed::lim<command_max>(command_usable_);
 
-constexpr char strmark_='"';
+constexpr char strmark_='\'';
 constexpr int strlit_max= code_len < 100 ? code_len : 100;
 constexpr auto string_literal
 	= strmark_
 	>> +(weed::lim<strlit_max> (weed::char_ - strmark_))
 	>> strmark_;
 
-constexpr auto char_literal
-	= '\'' >> weed::char_ >> '\''
-	| '\'' >> weed::char_;
-
-constexpr auto literal= string_literal | char_literal;
+constexpr auto literal= string_literal;
 
 template <class String>
 constexpr auto at(const String&str,unsigned int i) -> decltype(str.size(),'\0')
