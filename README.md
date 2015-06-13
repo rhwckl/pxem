@@ -1,7 +1,7 @@
 # pxem
 compile-time interpreter of pxem
 
-compile: (Boost and Sprout library is needed)
+compile: (Boost and Sprout library are needed)
 ```
 $ clang++ -std=c++14 hello_world/*.hpp
 ```
