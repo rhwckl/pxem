@@ -113,18 +113,18 @@ COMMAND_APPEND(command) \
 { \
 	typedef last2<Stack> tmp; \
 	typedef typename branch \
-		<typename tmp::pop2 \
+		<typename tmp::pop2::type \
 		,Tmp,iidx,idx \
 		,mpl::op \
-			<typename tmp::second_popped \
-			,typename tmp::first_popped \
+			<typename tmp::second_popped::type \
+			,typename tmp::first_popped::type \
 			>::type::value \
 		>::type type; \
 };
 
-CONDITIONAL_BRANCH_COMMAND('x',greater);
-CONDITIONAL_BRANCH_COMMAND('y',less);
-CONDITIONAL_BRANCH_COMMAND('z',equal_to);
+CONDITIONAL_BRANCH_COMMAND("x",greater);
+CONDITIONAL_BRANCH_COMMAND("y",less);
+CONDITIONAL_BRANCH_COMMAND("z",equal_to);
 
 #undef CONDITIONAL_BRANCH_COMMAND
 
