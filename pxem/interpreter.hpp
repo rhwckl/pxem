@@ -57,9 +57,10 @@ static constexpr auto command_
 	= +weed::lim<command_max>(command_usable_);
 
 constexpr char strmark_='\'';
+constexpr auto strmark=weed::char_(strmark_);
 constexpr int strlit_max= code_len < 100 ? code_len : 100;
 constexpr auto string_literal
-	= strmark_
+	= strmark
 	>> +(weed::lim<strlit_max> (weed::char_ - strmark_))
 	>> strmark_;
 
@@ -138,19 +139,30 @@ struct arginterp
 				return ret;
 		return ret;
 	}
-	static constexpr int argc_c=_argc();
-	typedef typename mpl::int_<argc_c> argc;
+	typedef typename mpl::int_<_argc()> argc;
 
-	struct Argv_v{
-		constexpr auto operator[](int i)const{
-			return sprout::get<0>(_argv[i]);
-		}
+	static constexpr int argmark(int i) {
+		auto mark=sprout::get<0>(result.attr()[i])[0];
+		if(mark=='\'') return '\'';
+
+		return -1;
+	}
+
+	template<class Int,int argmark_=argmark(Int::value)> struct argve
+	{ static_assert((argmark_,false),"invalid arguments"); };
+
+	template<class Int> struct argve<Int,'\''>{
+		typedef typename mpl::pop_front
+			<str2seq
+				(mpl::vector<>
+				,sprout::get<0>(result.attr()[Int::value])
+				)
+			>::type type;
 	};
-	static constexpr Argv_v argv_v{};
 
 	template<class Int>
 	struct argv{
-		typedef str2seq(mpl::vector<>,argv_v[Int::value]) type;
+		typedef typename argve<Int>::type type;
 	};
 
 };
