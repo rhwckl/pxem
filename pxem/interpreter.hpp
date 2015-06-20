@@ -31,6 +31,7 @@ char*gets(char*);
 #include <sprout/functional.hpp>
 #include <sprout/string.hpp>
 #include <sprout/weed.hpp>
+#include <sprout/cstdlib.hpp>
 
 namespace pxem
 {
@@ -54,7 +55,7 @@ constexpr auto command_usable_
 	| '+' | '-' | '!' | '_' ;
 
 static constexpr auto command_
-	= +weed::lim<command_max>(command_usable_);
+	= +weed::lim<command_max>(command_usable_) >> '.';
 
 constexpr char strmark_='\'';
 constexpr auto strmark=weed::char_(strmark_);
@@ -64,15 +65,20 @@ constexpr auto string_literal
 	>> +(weed::lim<strlit_max> (weed::char_ - strmark_))
 	>> strmark_;
 
-constexpr auto literal= string_literal;
+#define DECL(z,n,u) weed::char_((char)(n+'0')) |
+constexpr auto digit=BOOST_PP_REPEAT(9,DECL,~) weed::char_('9');
+#undef DECL
+
+constexpr auto positive= +weed::lim<10>(digit);
+constexpr auto negative= weed::char_('-') >> positive;
+constexpr auto integer=negative|positive;
+constexpr auto int_literal=negative|positive;
+
+constexpr auto literal= string_literal | int_literal;
 
 template <class String>
-constexpr auto at(const String&str,unsigned int i) -> decltype(str.size(),'\0')
+constexpr auto at(const String&str,unsigned int i)
 { return i>=str.size() ? '\0' : str[i]; }
-
-template <typename T,int N>
-constexpr char at(T(&str)[N],unsigned int i)
-{ return i>=N ? '\0' : str[i]; }
 
 template<class Sequence,char c,bool>
 struct char_push_back : mpl::push_back<Sequence,mpl::char_<c>> {};
@@ -89,9 +95,12 @@ struct char_push_back<Sequence,c,true> : Sequence {};
 		Sequence \
 	BOOST_PP_REPEAT(STRLIT_MAX,DECL2,str)
 
-constexpr bool isiden(char c){
-	const char t[1]{c};
-	return weed::parse(t,command_usable_).success();
+constexpr bool iscommand(int idx){
+	return weed::parse
+		(code.begin()+idx
+		,code.begin()+end_pos
+		,command_
+		).success();
 }
 
 template<int idx>
@@ -103,11 +112,13 @@ struct arginterp
 		{
 			auto tmp=sprout::find
 				(start
-				,code.end()+end_pos
+				,code.begin()+end_pos
 				,'.'
 				);
-			if(isiden(*(tmp+1)))
-				return tmp-code.begin();
+
+			if(tmp+1==code.begin()+end_pos
+				|| iscommand(tmp+1-code.begin()))
+				return tmp+1-code.begin();
 
 		#ifdef __clang__
 			start=tmp;
@@ -116,10 +127,10 @@ struct arginterp
 		#endif
 		}
 	}
-	static constexpr auto next=_next()+1;
+	static constexpr auto next=_next();
 
 	static constexpr auto command_with_arg
-		= command_ >> '.'
+		= command_
 		>> *weed::lim<argc_max> (weed::as_tuple[literal] >> '.');
 
 	static constexpr auto parser=command_with_arg;
@@ -145,6 +156,9 @@ struct arginterp
 		auto mark=sprout::get<0>(result.attr()[i])[0];
 		if(mark=='\'') return '\'';
 
+		if(sprout::isdigit(mark)) return 0;
+		if(mark=='-') return 0;
+
 		return -1;
 	}
 
@@ -158,6 +172,13 @@ struct arginterp
 				,sprout::get<0>(result.attr()[Int::value])
 				)
 			>::type type;
+	};
+
+	template<class Int> struct argve<Int,0>{
+		typedef mpl::vector
+			<mpl::int_
+				<sprout::atoi(sprout::get<0>(result.attr()[Int::value]).c_str())>
+			> type;
 	};
 
 	template<class Int>
